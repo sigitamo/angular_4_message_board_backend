@@ -6,8 +6,9 @@ var messages = [
     { text: 'some text', owner: 'Anderw' },
     { text: 'some koko text', owner: 'MotoAnderw'},
     { text: 'some text', owner: 'AlohaAnderw' }
-];
+]; 
 app.use(bodyParser.json());
+ 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With,Content-Type,Accept");
@@ -35,3 +36,4 @@ api.post('/messages',(req, res) => {
 app.use('/api', api);
 
 app.listen(63145);
+ 

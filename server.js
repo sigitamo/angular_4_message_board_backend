@@ -1,12 +1,15 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var jwt = require('jsonwebtoken');
 
 var messages = [
     { text: 'some text', owner: 'Anderw' },
     { text: 'some koko text', owner: 'MotoAnderw'},
     { text: 'some text', owner: 'AlohaAnderw' }
-]; 
+];
+var  users = [];
+
 app.use(bodyParser.json());
  
 app.use((req, res, next) => {
@@ -16,6 +19,7 @@ app.use((req, res, next) => {
 })
 
 var api = express.Router();
+var auth = express.Router();
 
 api.get('/messages',(req, res) => {
     res.json(messages);
@@ -33,7 +37,20 @@ api.post('/messages',(req, res) => {
     res.json(req.body);
 })
 
-app.use('/api', api);
+auth.post('/register', (req, res) => {
+    // console.log(req.body);
+    var index =  users.push(req.body) - 1;
+    
+    var user = users[index]; 
+    user.id = index;
+
+    var token = jwt.sign(user.id, '123'); 
+    res.json(token);
+})
+
+app.use('/api', api);  //route
+app.use('/auth', auth); //route
+
 
 app.listen(63145);
  

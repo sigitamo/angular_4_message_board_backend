@@ -8,7 +8,7 @@ var messages = [
     { text: 'some koko text', owner: 'MotoAnderw'},
     { text: 'some text', owner: 'AlohaAnderw' }
 ];
-var  users = [];
+var  users = [{firstName: 'a', email: 'a', password: 'a', id: 0}];
 
 app.use(bodyParser.json());
  
@@ -21,13 +21,13 @@ app.use((req, res, next) => {
 var api = express.Router();
 var auth = express.Router();
 
-api.get('/messages',(req, res) => {
-    res.json(messages);
+api.get('/messages', (req, res) => {
+    res.json(messages); 
 })
 
-api.get('/messages/:user',(req, res) => {
+api.get('/messages/:user', (req, res) => { 
     var user = req.params.user;
-    var result = messages.filter(message=>message.owner == user);
+    var result = messages.filter(message => message.owner == user);
     
     res.json(result);
 })
@@ -37,19 +37,39 @@ api.post('/messages',(req, res) => {
     res.json(req.body);
 })
 
+
+auth.post('/login', (req, res) => {
+    var user = users.find(user => user.email == req.body.email);
+    if(!user)
+        sendAuthError(res);
+    
+    if(user.password == req.body.password) 
+        sendToken(user, res);
+    else 
+        sendAuthError(res);
+})
+
 auth.post('/register', (req, res) => {
     // console.log(req.body);
     var index =  users.push(req.body) - 1;
     
-    var user = users[index]; 
+    var user = users[index];  
     user.id = index;
 
-    var token = jwt.sign(user.id, '123'); 
-    res.json(token);
+    sendToken(user, res);
 })
 
+function sendToken(user, res) {
+    var token = jwt.sign(user.id, '123'); 
+    res.json({token, firstName: user.firstName });
+}
+
+function sendAuthError(res) {
+    return res.json({ success: false, message: 'email or password incorect'});
+}
+
 app.use('/api', api);  //route
-app.use('/auth', auth); //route
+app.use('/auth', auth); //route 
 
 
 app.listen(63145);
